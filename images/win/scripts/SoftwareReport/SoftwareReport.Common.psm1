@@ -3,10 +3,9 @@ function Get-OSName {
 }
 
 function Get-OSVersion {
-    $systemInfo = Get-CimInstance -ClassName Win32_OperatingSystem
-    $OSVersion = $systemInfo.Version
-    $OSBuild = $systemInfo.BuildNumber
-    return "OS Version: $OSVersion Build $OSBuild"
+    $systemInfo = cmd /c ver
+    $OSVersion = $systemInfo[$systemInfo.Length-1]
+    return "OS Version: $OSVersion"
 }
 
 function Get-JavaVersionsList {

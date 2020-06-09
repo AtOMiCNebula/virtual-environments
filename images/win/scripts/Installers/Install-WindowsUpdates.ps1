@@ -1,7 +1,7 @@
 ################################################################################
 ##  File:  Install-WindowsUpdates.ps1
 ##  Desc:  Install Windows Updates.
-##         Should be run at end just before Antivirus.
+##         Should be run at end just before Finalize-VM.ps1.
 ################################################################################
 
 Write-Host "Run windows updates"
