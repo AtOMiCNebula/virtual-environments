@@ -5,8 +5,8 @@
         "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
         "tenant_id": "{{env `ARM_TENANT_ID`}}",
         "object_id": "{{env `ARM_OBJECT_ID`}}",
-        "resource_group": "{{env `ARM_RESOURCE_GROUP`}}",
-        "storage_account": "{{env `ARM_STORAGE_ACCOUNT`}}",
+        "managed_image_resource_group_name": "{{env `ARM_MANAGED_IMAGE_RESOURCE_GROUP_NAME`}}",
+        "managed_image_name": "{{env `ARM_MANAGED_IMAGE_NAME`}}",
         "temp_resource_group_name": "{{env `TEMP_RESOURCE_GROUP_NAME`}}",
         "location": "{{env `ARM_RESOURCE_LOCATION`}}",
         "ssh_password": "{{env `SSH_PASSWORD`}}",
@@ -27,7 +27,6 @@
         "commit_id": "LATEST",
         "install_user": "installer",
         "install_password": null,
-        "capture_name_prefix": "packer",
         "image_version": "dev",
         "image_os": "win19",
         "github_feed_token": "{{env `GITHUB_FEED_TOKEN`}}",
@@ -37,7 +36,7 @@
     "sensitive-variables": ["install_password", "ssh_password", "client_secret", "github_feed_token"],
     "builders": [
         {
-            "name": "vhd",
+            "name": "managedimage",
             "type": "azure-arm",
             "client_id": "{{user `client_id`}}",
             "client_secret": "{{user `client_secret`}}",
@@ -47,11 +46,9 @@
             "os_disk_size_gb": "256",
             "location": "{{user `location`}}",
             "vm_size": "{{user `vm_size`}}",
-            "resource_group_name": "{{user `resource_group`}}",
-            "storage_account": "{{user `storage_account`}}",
+            "managed_image_resource_group_name": "{{user `managed_image_resource_group_name`}}",
+            "managed_image_name": "{{user `managed_image_name`}}",
             "temp_resource_group_name": "{{user `temp_resource_group_name`}}",
-            "capture_container_name": "images",
-            "capture_name_prefix": "{{user `capture_name_prefix`}}",
             "virtual_network_name": "{{user `virtual_network_name`}}",
             "virtual_network_resource_group_name": "{{user `virtual_network_resource_group_name`}}",
             "virtual_network_subnet_name": "{{user `virtual_network_subnet_name`}}",
@@ -502,12 +499,6 @@
             "type": "powershell",
             "scripts":[
                 "{{ template_dir }}/scripts/Installers/Install-DotnetSDK.ps1"
-            ]
-        },
-        {
-            "type": "powershell",
-            "scripts":[
-                "{{ template_dir }}/scripts/Installers/Install-WindowsUpdates.ps1"
             ]
         },
         {
@@ -1003,6 +994,30 @@
             "scripts":[
                 "{{ template_dir }}/scripts/Installers/Validate-DiskSpace.ps1"
             ]
+        },
+        {
+            "type": "powershell",
+            "scripts":[
+                "{{ template_dir }}/scripts/Installers/Install-WindowsUpdates.ps1"
+            ],
+            "elevated_user": "{{user `install_user`}}",
+            "elevated_password": "{{user `install_password`}}"
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "10m"
+        },
+        {
+            "type": "powershell",
+            "scripts":[
+                "{{ template_dir }}/scripts/Installers/Install-WindowsUpdates.ps1"
+            ],
+            "elevated_user": "{{user `install_user`}}",
+            "elevated_password": "{{user `install_password`}}"
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "10m"
         },
         {
             "type": "powershell",
